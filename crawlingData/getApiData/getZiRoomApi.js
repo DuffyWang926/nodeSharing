@@ -12,7 +12,6 @@ let getZiRoomApi = async (key) =>{
     resultend = resultend.concat(eggShellData)
     return resultend
 }
-
 module.exports = {
     getZiRoomApi
 }
