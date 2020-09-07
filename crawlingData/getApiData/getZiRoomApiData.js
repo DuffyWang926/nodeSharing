@@ -92,6 +92,7 @@ let getDataFromHtml = (data) =>{
                 let text = item(v).text()
                 tagList.push(text)
             })
+            
             let res = { 
                 imgSrc:imgSrc,
                 title:title,
@@ -101,7 +102,8 @@ let getDataFromHtml = (data) =>{
                 distance:distance,
                 price:priceList,
                 tagList:tagList,
-                detailUrl:detailUrl
+                detailUrl:detailUrl,
+                id:detailUrl
             }
             
             result.push(res)

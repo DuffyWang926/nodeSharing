@@ -81,7 +81,8 @@ let getDataFromHtml = (data) =>{
             distance:distance,
             price,
             tagList:[],
-            detailUrl:detailUrl
+            detailUrl:detailUrl,
+            id:detailUrl
         }
         
         result.push(res)
