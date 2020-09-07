@@ -13,6 +13,7 @@ var fn_roomList = async (ctx, next) => {
     }else{
         result = await getZiRoomApi.getZiRoomApi(key)
     }
+
     ctx.response.body = {
         data:result
     }

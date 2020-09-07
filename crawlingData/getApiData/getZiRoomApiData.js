@@ -1,6 +1,7 @@
 const https = require('https');
 const axios = require("axios");
 const cheerio = require('cheerio');
+const getNumFromUrl = require('../getNum/getNum.js')
  
 
 let getZiRoomApiData = async (key) =>{
@@ -45,11 +46,11 @@ let getZiRoomApiData = async (key) =>{
 
 }
 
-let getDataFromHtml = (data) =>{
+let getDataFromHtml = async (data) =>{
     const $ = cheerio.load(data);
     let result = []
     let items = $('div.item')
-    items.each((i,e) =>{
+    await items.each( async (i,e) =>{
         let item = cheerio.load(e)
         let len = item('span').length
         if(len > 5){
@@ -80,8 +81,28 @@ let getDataFromHtml = (data) =>{
             let distanceNode = item('div.location')
             let distance = distanceNode.text().trim().replace('\n','').replace('\t','').replace(' ','')
             let priceList = [] 
-            let priceNodeList = item('span.num').each((i,v) =>{
-                let styleText = item(v).attr('style').replace('//','http://') 
+            let priceUrl = ''
+            let positionList = []
+            item('span.num').each((k,v) =>{
+                let styleText = item(v).attr('style').replace('//','http://')
+                let textList = styleText.split(';')
+                if(textList.length > 1){
+                    if(!priceUrl){
+                        let urlList = textList[0].split(':')
+                        if(urlList && urlList.length > 1){
+                            priceUrl = urlList[1].replace('url(','') + ':' + urlList[2].replace(')','')
+                            priceUrl = priceUrl.trim()
+                        }
+                    }
+                    let positionArray = textList[1].split(':')
+                    if(positionArray && positionArray.length > 0){
+                        let position = Math.abs(+positionArray[1].replace('px',''))
+                        positionList.push(position)
+
+                    }
+
+                }
+                 
                 priceList.push(styleText) 
             })
             let tagList = []
@@ -89,6 +110,12 @@ let getDataFromHtml = (data) =>{
                 let text = item(v).text()
                 tagList.push(text)
             })
+            let price = 0
+            
+            if(i < 2){
+                price = getNumFromUrl( priceUrl, positionList)
+            }
+            
             let res = { 
                 imgSrc:imgSrc,
                 title:title,
@@ -96,12 +123,14 @@ let getDataFromHtml = (data) =>{
                 floor:floor,
                 floorTotal:floorTotal,
                 distance:distance,
-                price:priceList,
+                price,
+                priceList,
                 tagList:tagList,
                 detailUrl:detailUrl
             }
-            
+            if(i < 2){
             result.push(res)
+            }
         }
     })
     return result
