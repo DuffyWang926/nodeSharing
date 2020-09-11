@@ -1,6 +1,8 @@
 const model = require('../model');
 const fs = require('fs');
 const cityArr = require('./chinese_cities')
+const { findUser, creatUser } = require('../dealBb/dealUser')
+const {userTip} = require('../constants/userTip')
 
 var fn_index = async (ctx, next) => {
     ctx.render('index.html', {
@@ -9,44 +11,51 @@ var fn_index = async (ctx, next) => {
 }
 
 var fn_signin = async (ctx, next) => {
-    var
-        email = ctx.request.body.email || '',
-        password = ctx.request.body.password || '';
+    let body = ctx.request.body
+    let email = body.email || ''
+    let password = body.password || '';
+    
+    let user = await findUser(email) || []
+    let code = 200
+    let data = []
+    let msg = ''
+
+    if(user && user.length > 0){
+        code = 200
+        msg = userTip.userExisted
         
-    if (email === 'admin@example.com' && password === '123456') {
-        // 登录成功:
-        ctx.render('signin-ok.html', {
-            title: 'Sign In OK',
-            name: 'Mr Node'
-        });
-    } else {
-        // 登录失败:
-        ctx.render('signin-failed.html', {
-            title: 'Sign In Failed'
-        });
+
+    }else{
+        let userInsert = await creatUser(body)
+    }
+    
+    ctx.response.body = {
+        code,
+        data,
+        msg
     }
 }
 
 let fn_logIn = async (ctx, next) => {
-    let name = ctx.request.body.userName || '',
-        password = ctx.request.body.userPassword || '';
-    let User = model.User;
-    let user = await User.findAll({
-        where: {
-            name
-        }
-    });
+    let email = ctx.request.body.email || ''
+    let password = ctx.request.body.password || '';
     
-    console.log('find: ' + JSON.stringify(user));
+    let user = await findUser(email)
+    let code = 200
+    let data = []
+    let msg = ''
 
-    if (user.length > 0) {
-        ctx.response.body= {
-            name:'wefRoot'
-        }
-    } else {
-        ctx.response.body= {
-            msg:'用户不存在'
-        }
+    if(user && user.length > 0){
+
+    }else{
+        code = 401
+        msg = userTip.userEmpty
+    }
+    
+    ctx.response.body = {
+        code,
+        data,
+        msg
     }
 }
 
