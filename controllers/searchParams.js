@@ -1,9 +1,7 @@
 const model = require('../model');
 const fs = require('fs');
 const cityArr = require('./chinese_cities')
-const { findUser, creatUser } = require('../dealBb/dealUser')
 const {userTip} = require('../constants/userTip')
-const {mysqlTip} = require('../constants/mysqlTip')
 const chalk = require('chalk')
 const log = console.log
 

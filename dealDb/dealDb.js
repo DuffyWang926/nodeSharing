@@ -1,9 +1,8 @@
-const model = require('../model');
-let User = model.User;
+
 const { dateFormat } = require('../utils/dateMethod')
 const chalk = require('chalk')
 const log = console.log
-async function findUser(email){
+async function findItem(User, email){
     let user = {}
     try {
         user = await User.findAll({
@@ -18,7 +17,7 @@ async function findUser(email){
     return user
 }
 
-async function creatUser(obj){
+async function createItem(User, obj){
     let date = new Date()
     let now = dateFormat(date,"yyyy-MM-dd HH:mm:ss")
     obj.createdAt = now
@@ -36,7 +35,7 @@ async function creatUser(obj){
     return userInsert
 }
 
-async function updateUser(obj){
+async function updateItem(User, obj, query){
     let date = new Date()
     let now = dateFormat(date,"yyyy-MM-dd HH:mm:ss")
     obj.createdAt = now
@@ -44,12 +43,13 @@ async function updateUser(obj){
     obj.userId = obj.email
     obj.id = obj.email
     let userUpdate = {}
+    
     try {
         userUpdate = await User.update(
             {
                 ...obj
             }, {
-              where:{ userId:obj.email}
+              where:{...query }
             }
           )
     } catch (e) {
@@ -59,7 +59,7 @@ async function updateUser(obj){
     return userUpdate
 }
 
-async function deleteUser(obj){
+async function deleteItem(User, obj){
     let userUpdate = {}
     try {
         userUpdate = await User.destroy(
@@ -77,8 +77,8 @@ async function deleteUser(obj){
 
 
 module.exports = {
-    findUser,
-    creatUser,
-    updateUser,
-    deleteUser
+    findItem,
+    createItem,
+    updateItem,
+    deleteItem
 }
